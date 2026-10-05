@@ -1,5 +1,6 @@
 .env
 .env.*
+.DS_Store
 !.env.example
 /server
 /loyaltyledger
