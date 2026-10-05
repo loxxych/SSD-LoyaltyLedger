@@ -1,0 +1,10 @@
+server_host: "127.0.0.1"
+server_port: 8080
+log_level: "info"
+accrual_interval_seconds: 3
+worker_concurrency: 5
+order_service_url: "http://localhost:8081"
+order_service_timeout_seconds: 5
+token_ttl_hours: 24
+reward_percent: 5
+# DATABASE_URL, ADMIN_LOGIN, ADMIN_PASSWORD and ORDER_SERVICE_API_KEY come from env.

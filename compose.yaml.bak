@@ -1,0 +1,67 @@
+name: loyaltyledger
+services:
+  postgres:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_DB: loyaltyledger
+      POSTGRES_USER: loyaltyledger
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in .env}
+    ports:
+      - "127.0.0.1:5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U loyaltyledger -d loyaltyledger"]
+      interval: 3s
+      timeout: 3s
+      retries: 20
+  app:
+    build: .
+    environment:
+      SERVER_HOST: 0.0.0.0
+      DATABASE_URL: postgres://loyaltyledger:${POSTGRES_PASSWORD}@postgres:5432/loyaltyledger?sslmode=disable
+      ORDER_SERVICE_URL: ${ORDER_SERVICE_URL:?Set ORDER_SERVICE_URL in .env}
+      ORDER_SERVICE_API_KEY: ${ORDER_SERVICE_API_KEY:-}
+      ADMIN_LOGIN: ${ADMIN_LOGIN:?Set ADMIN_LOGIN in .env}
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD:?Set ADMIN_PASSWORD in .env}
+      REWARD_PERCENT: ${REWARD_PERCENT:-5}
+    ports:
+      - "127.0.0.1:8080:8080"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "wget", "-q", "-O", "/dev/null", "http://127.0.0.1:8080/readyz"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+    stop_grace_period: 20s
+  orderstub:
+    profiles: ["local"]
+    build: .
+    command: ["/app/orderstub", "-addr", ":8081", "-fixtures", "/app/testdata/orders.json"]
+    environment:
+      ORDER_SERVICE_API_KEY: ${ORDER_SERVICE_API_KEY:-}
+    ports:
+      - "127.0.0.1:8081:8081"
+    healthcheck:
+      test: ["CMD", "wget", "-q", "-O", "/dev/null", "http://127.0.0.1:8081/healthz"]
+      interval: 3s
+      timeout: 3s
+      retries: 20
+  tests:
+    profiles: ["test"]
+    image: golang:1.26
+    working_dir: /src
+    volumes:
+      - .:/src:ro
+      - go_modules:/go/pkg/mod
+    environment:
+      TEST_DATABASE_URL: postgres://loyaltyledger:${POSTGRES_PASSWORD}@postgres:5432/loyaltyledger?sslmode=disable
+    depends_on:
+      postgres:
+        condition: service_healthy
+    command: ["sh", "-c", "cp -a /src /tmp/project && cd /tmp/project && go mod download && go test -race -count=1 -cover ./... && go vet ./... && go build ./..."]
+volumes:
+  postgres_data:
+  go_modules:
