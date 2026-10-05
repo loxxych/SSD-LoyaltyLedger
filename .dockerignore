@@ -1,0 +1,9 @@
+.git
+.env
+.env.*
+!.env.example
+*.zip
+*.log
+coverage*
+server
+loyaltyledger
