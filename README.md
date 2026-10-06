@@ -159,7 +159,7 @@ curl -H "Authorization: Bearer $ADMIN_TOKEN" \
 
 ## Запуск без Docker
 
-Требуются Go 1.22+ и PostgreSQL. Пример для PostgreSQL, запущенного локальным Compose:
+Требуются Go 1.22+ и PostgreSQL, отдельно доступный с хоста по адресу `localhost:5432`. Сервис PostgreSQL из текущего `compose.yaml` не публикует порт на Mac, поэтому приведённый ниже адрес к базе из Compose не подключится. Для контейнерного запуска используйте инструкции выше.
 
 ```bash
 export DATABASE_URL='postgres://loyaltyledger:local-change-me-2026@localhost:5432/loyaltyledger?sslmode=disable'
