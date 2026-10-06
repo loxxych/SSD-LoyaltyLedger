@@ -1,0 +1,7 @@
+[
+ {"number":"79927398713","owner_id":2,"status":"COMPLETED","amount":1000.00},
+ {"number":"12345678903","owner_id":2,"status":"CREATED","amount":500.00},
+ {"number":"4532015112830366","owner_id":2,"status":"PAID","amount":800.00},
+ {"number":"4012888888881881","owner_id":2,"status":"CANCELLED","amount":250.00},
+ {"number":"5555555555554444","owner_id":3,"status":"COMPLETED","amount":1200.00}
+]
